@@ -1,0 +1,24 @@
+//
+//  ContentView.swift
+//  MTGSpotlight
+//
+//  Created by Rafael Plinio on 19/03/26.
+//
+
+import SwiftUI
+
+struct ContentView: View {
+    var body: some View {
+        VStack {
+            Image(systemName: "globe")
+                .imageScale(.large)
+                .foregroundStyle(.tint)
+            Text("Hello, world!")
+        }
+        .padding()
+    }
+}
+
+#Preview {
+    ContentView()
+}
