@@ -11,11 +11,11 @@ import Testing
 
 @MainActor
 struct HomeViewModelTests {
-    @Test func loadPublishesLoadedStateForSelectedVariant() {
+    @Test func loadPublishesLoadedStateForDeckSpotlight() async {
         let service = MockSpotlightContentService()
         let viewModel = HomeViewModel(contentService: service)
 
-        viewModel.load()
+        await viewModel.load()
 
         guard case let .loaded(screen) = viewModel.state else {
             Issue.record("Expected loaded state after successful load")
@@ -23,31 +23,30 @@ struct HomeViewModelTests {
         }
 
         #expect(screen.title == "Phoenix Screen")
-        #expect(service.requestedResources == ["deck-spotlight"])
+        #expect(service.fetchCallCount == 1)
     }
 
-    @Test func selectVariantReloadsUsingNewResourceName() {
+    @Test func retryReloadsAfterInitialSuccess() async {
         let service = MockSpotlightContentService()
         let viewModel = HomeViewModel(contentService: service)
 
-        viewModel.load()
-        viewModel.selectVariant(.control)
+        await viewModel.load()
+        await viewModel.retry()
 
         guard case let .loaded(screen) = viewModel.state else {
-            Issue.record("Expected loaded state after selecting a new variant")
+            Issue.record("Expected loaded state after retrying")
             return
         }
 
-        #expect(viewModel.selectedVariant == .control)
-        #expect(screen.title == "Control Screen")
-        #expect(service.requestedResources == ["deck-spotlight", "deck-spotlight-control"])
+        #expect(screen.title == "Phoenix Screen")
+        #expect(service.fetchCallCount == 2)
     }
 
-    @Test func loadPublishesErrorStateOnServiceFailure() {
+    @Test func loadPublishesErrorStateOnServiceFailure() async {
         let service = MockSpotlightContentService(result: .failure(MockError.failedToLoad))
         let viewModel = HomeViewModel(contentService: service)
 
-        viewModel.load()
+        await viewModel.load()
 
         guard case let .error(message) = viewModel.state else {
             Issue.record("Expected error state after service failure")
@@ -59,14 +58,11 @@ struct HomeViewModelTests {
 
     @Test func handleActionAcceptsOpenDeckAction() {
         let viewModel = HomeViewModel(contentService: MockSpotlightContentService())
-        let previousVariant = viewModel.selectedVariant
         let previousState = viewModel.state
 
         viewModel.handle(
             SpotlightAction(type: "openDeck", payload: ["deckId": "izzet-phoenix"])
         )
-
-        #expect(viewModel.selectedVariant == previousVariant)
 
         guard case .loading = previousState else {
             Issue.record("Expected test precondition to start from loading state")
@@ -87,27 +83,18 @@ private final class MockSpotlightContentService: SpotlightContentServing {
     }
 
     private let result: Result
-    private(set) var requestedResources: [String] = []
+    private(set) var fetchCallCount = 0
 
     init(result: Result = .success) {
         self.result = result
     }
 
-    func fetchScreen(named resourceName: String) throws -> SpotlightScreen {
-        requestedResources.append(resourceName)
+    func fetchDeckSpotlight() async throws -> SpotlightScreen {
+        fetchCallCount += 1
 
         switch result {
         case .success:
-            switch resourceName {
-            case "deck-spotlight":
-                return SpotlightScreen.fixture(title: "Phoenix Screen")
-            case "deck-spotlight-control":
-                return SpotlightScreen.fixture(title: "Control Screen")
-            case "deck-spotlight-midrange":
-                return SpotlightScreen.fixture(title: "Midrange Screen")
-            default:
-                return SpotlightScreen.fixture(title: "Fallback Screen")
-            }
+            return SpotlightScreen.fixture(title: "Phoenix Screen")
         case let .failure(error):
             throw error
         }

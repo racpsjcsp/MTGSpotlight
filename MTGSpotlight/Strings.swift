@@ -14,6 +14,8 @@ struct Strings {
     static let loadingDeckSpotlightTitle = "Loading Deck Spotlight..."
     static let loadingFailedTitle = "Unable to Load Deck Spotlight"
     static let retryButtonTitle = "Retry"
-    static let demoVariantTitle = "JSON Demo Variant"
     static let spotlightContentMissingResourceErrorFormat = "The local JSON file '%@.json' could not be found."
+    static let spotlightContentMissingAPIBaseURLError = "The API base URL is not configured for this device."
+    static let spotlightContentInvalidResponseError = "The server returned an invalid response."
+    static let spotlightContentRequestFailedErrorFormat = "The server request failed with status code %d."
 }

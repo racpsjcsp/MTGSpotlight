@@ -80,10 +80,12 @@ Typed payloads and supporting UI models.
 
 1. `HomeView` appears.
 2. `HomeViewModel` requests a spotlight screen from a content service.
-3. `LocalSpotlightContentService` loads a local JSON payload for the selected variant.
+3. `RemoteSpotlightContentService` requests `GET /screens/deck-spotlight` from the Vapor backend.
 4. JSON is decoded into typed models.
 5. `ScreenRenderer` loops through components and renders the matching SwiftUI view for each supported type.
 6. User actions are routed back to the ViewModel.
+
+The local JSON service still exists for previews and fixture-based tests, but it is no longer the default app path.
 
 ## Suggested Folder Structure
 
@@ -125,6 +127,18 @@ MTGSpotlight/
 - `PreviewData/` allows local rendering and easier iteration before backend integration is complete
 - `SDUI/Services/` keeps content loading away from views and ViewModels
 
+## Current Smells
+
+These are the main issues visible after the first Vapor integration:
+
+- the backend-client contract is still brittle, because small naming mismatches can silently drop components during decoding
+- the app logs decoding failures in debug builds, but there is no stronger contract validation or diagnostics surfaced to the user
+- the base URL strategy is now safer, but still environment-driven and easy to misconfigure across simulator and device runs
+- `HomeViewModel` now uses structured logging, but diagnostics are still fairly minimal
+- action handling is still stubbed and does not yet prove a full end-to-end interaction path
+
+These are acceptable for the current learning phase, but they should drive the next cleanup steps.
+
 ## Navigation
 
 Do not introduce a coordinator layer yet unless navigation becomes complex.
@@ -146,3 +160,10 @@ For Phase 1, keep navigation simple and local to the feature. Add a router only 
 6. Add action handling and expand components only when needed.
 
 This keeps the learning curve shallow and makes each step easy to inspect.
+
+## Current Status
+
+- Phase 1 foundation is complete
+- local SDUI rendering is complete
+- the app now loads the spotlight screen from Vapor
+- the next useful work is hardening the contract and improving diagnostics rather than adding more component types immediately

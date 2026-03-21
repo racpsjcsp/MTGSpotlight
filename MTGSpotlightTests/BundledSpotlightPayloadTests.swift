@@ -11,17 +11,11 @@ import Testing
 
 @MainActor
 struct BundledSpotlightPayloadTests {
-
-    @Test(arguments: [
-        "deck-spotlight",
-        "deck-spotlight-control",
-        "deck-spotlight-midrange"
-    ])
-    func bundledPayloadDecodes(resourceName: String) throws {
+    @Test func bundledPayloadDecodes() async throws {
         let bundle = Bundle(for: TestBundleMarker.self)
         let service = LocalSpotlightContentService(bundle: bundle)
 
-        let screen = try service.fetchScreen(named: resourceName)
+        let screen = try await service.fetchDeckSpotlight()
 
         #expect(!screen.screenID.isEmpty)
         #expect(screen.version == 1)

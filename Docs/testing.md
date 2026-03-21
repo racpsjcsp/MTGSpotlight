@@ -55,6 +55,8 @@ Verify that:
 - required fields are present
 - supported component types are emitted correctly
 - action payloads follow the expected shape
+- field names match the documented contract exactly
+- component-level required keys like `id`, `type`, and `props` are always present
 
 ## Lower Priority At The Start
 
@@ -93,12 +95,15 @@ Client:
 - ignore or safely fail an unknown component type
 - ViewModel publishes loading then loaded state
 - ViewModel publishes error state on service failure
+- remote content service hits `/screens/deck-spotlight`
+- remote content service fails predictably on non-2xx responses
 
 Backend:
 
 - `GET /screens/deck-spotlight` returns HTTP 200
 - response includes `screenId`, `version`, and `components`
-- `cardCarousel` payload includes cards with image URLs
+- every component includes `id`, `type`, and `props`
+- `button` action is emitted at the component level, not inside `props`
 
 ## Test Data Guidance
 
@@ -109,3 +114,12 @@ Backend:
 ## Rule Of Thumb
 
 If a change can break the app without changing SwiftUI layout code, it probably deserves a test in this project.
+
+## Current Gap
+
+The current project is already feeling the cost of weak contract enforcement:
+
+- the client can skip malformed components safely
+- but that same resilience can hide backend regressions unless tests catch them quickly
+
+That means backend contract tests and shared sample payload validation should now move up in priority.

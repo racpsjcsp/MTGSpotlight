@@ -27,7 +27,7 @@ struct HomeView: View {
                 .navigationBarTitleDisplayMode(.inline)
         }
         .task {
-            viewModel.load()
+            await viewModel.load()
         }
     }
 
@@ -35,18 +35,13 @@ struct HomeView: View {
     private var content: some View {
         switch viewModel.state {
         case .loading:
-            VStack(spacing: 24) {
-                variantPicker
-
-                ProgressView(Strings.loadingDeckSpotlightTitle)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
+            ProgressView(Strings.loadingDeckSpotlightTitle)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(20)
 
         case let .loaded(screen):
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    variantPicker
                     ScreenRenderer(components: screen.components, actionHandler: viewModel.handle)
                 }
                 .padding(20)
@@ -58,34 +53,13 @@ struct HomeView: View {
             } description: {
                 Text(message)
             } actions: {
-                variantPicker
                 Button(Strings.retryButtonTitle) {
-                    viewModel.retry()
+                    Task {
+                        await viewModel.retry()
+                    }
                 }
             }
         }
-    }
-
-    private var variantPicker: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(Strings.demoVariantTitle)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-
-            Picker(Strings.demoVariantTitle, selection: selectedVariantBinding) {
-                ForEach(HomeViewModel.Variant.allCases) { variant in
-                    Text(variant.title).tag(variant)
-                }
-            }
-            .pickerStyle(.segmented)
-        }
-    }
-
-    private var selectedVariantBinding: Binding<HomeViewModel.Variant> {
-        Binding(
-            get: { viewModel.selectedVariant },
-            set: { viewModel.selectVariant($0) }
-        )
     }
 
     private var navigationTitle: String {
@@ -109,6 +83,12 @@ struct HomeView: View {
     }
 }
 
-#Preview {
-    HomeView(viewModel: HomeViewModel(contentService: LocalSpotlightContentService(bundle: .main)))
+struct HomeView_Previews: PreviewProvider {
+    static var previews: some View {
+        HomeView(
+            viewModel: HomeViewModel(
+                contentService: LocalSpotlightContentService(bundle: .main)
+            )
+        )
+    }
 }

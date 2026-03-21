@@ -69,7 +69,7 @@ struct ScreenDecodingTests {
         """
         {
           "screenId": "deck-spotlight",
-          "version": 1,
+          "version": 1.0,
           "title": "Deck Spotlight",
           "components": [
             {
@@ -135,7 +135,7 @@ struct ScreenDecodingTests {
         """
         {
           "screenId": "deck-spotlight",
-          "version": 1,
+          "version": 1.0,
           "title": "Deck Spotlight",
           "components": [
             {
@@ -156,7 +156,7 @@ struct ScreenDecodingTests {
         """
         {
           "screenId": "deck-spotlight",
-          "version": 1,
+          "version": 1.0,
           "title": "Deck Spotlight",
           "components": [
             {
@@ -176,7 +176,7 @@ struct ScreenDecodingTests {
         """
         {
           "screenId": "deck-spotlight",
-          "version": 1,
+          "version": 1.0,
           "title": "Deck Spotlight",
           "components": [
             {

@@ -165,6 +165,8 @@ Recommended first action types:
 - unknown component types should be skipped safely
 - malformed props should not crash the app
 - unsupported or malformed components should be skipped with logging in debug builds
+- supported components are expected to include their required keys exactly as documented
+- a component missing `id`, `type`, or valid `props` should be considered a backend contract bug
 
 ## Schema Evolution Rules
 
@@ -172,6 +174,7 @@ Recommended first action types:
 - prefer additive changes when possible
 - avoid changing meanings of existing fields silently
 - document every contract change in `Docs/decisions.md`
+- treat type changes for existing fields as breaking changes
 
 ## Swift Modeling Guidance
 
@@ -195,3 +198,13 @@ enum SpotlightComponent: Decodable {
 ```
 
 This gives clearer rendering logic and much better testability than `[String: Any]` style parsing.
+
+## Integration Note
+
+The current client is intentionally strict about the contract:
+
+- `version` is an `Int`
+- every component requires `id` and `type`
+- `button` actions are decoded from the component level, not from `props`
+
+This strictness is deliberate. It makes integration failures visible early while the schema is still small enough to control.

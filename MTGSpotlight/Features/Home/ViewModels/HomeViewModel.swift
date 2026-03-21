@@ -7,39 +7,10 @@
 
 import Combine
 import Foundation
+import OSLog
 
 @MainActor
 final class HomeViewModel: ObservableObject {
-    enum Variant: String, CaseIterable, Identifiable {
-        case phoenix
-        case control
-        case midrange
-
-        var id: String { rawValue }
-
-        var title: String {
-            switch self {
-            case .phoenix:
-                return "Phoenix"
-            case .control:
-                return "Control"
-            case .midrange:
-                return "Midrange"
-            }
-        }
-
-        var resourceName: String {
-            switch self {
-            case .phoenix:
-                return "deck-spotlight"
-            case .control:
-                return "deck-spotlight-control"
-            case .midrange:
-                return "deck-spotlight-midrange"
-            }
-        }
-    }
-
     enum State {
         case loading
         case loaded(SpotlightScreen)
@@ -47,41 +18,36 @@ final class HomeViewModel: ObservableObject {
     }
 
     @Published private(set) var state: State = .loading
-    @Published private(set) var selectedVariant: Variant = .phoenix
 
+    private let logger = Logger(subsystem: "com.rafaelplinio.MTGSpotlight", category: "HomeViewModel")
     private let contentService: SpotlightContentServing
     private var hasLoaded = false
 
     init() {
-        self.contentService = LocalSpotlightContentService(bundle: .main)
+        self.contentService = RemoteSpotlightContentService()
     }
 
     init(contentService: SpotlightContentServing) {
         self.contentService = contentService
     }
 
-    func load() {
+    func load() async {
         guard !hasLoaded else { return }
         hasLoaded = true
 
         do {
-            let content = try contentService.fetchScreen(named: selectedVariant.resourceName)
+            let content = try await contentService.fetchDeckSpotlight()
             state = .loaded(content)
         } catch {
+            logger.error("Deck spotlight load failed: \(String(describing: error), privacy: .public)")
             state = .error(error.localizedDescription)
         }
     }
 
-    func retry() {
+    func retry() async {
         hasLoaded = false
         state = .loading
-        load()
-    }
-
-    func selectVariant(_ variant: Variant) {
-        guard selectedVariant != variant else { return }
-        selectedVariant = variant
-        retry()
+        await load()
     }
 
     func handle(_ action: SpotlightAction?) {

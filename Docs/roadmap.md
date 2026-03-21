@@ -35,6 +35,12 @@ Exit criteria:
 - the app loads the spotlight screen from the backend
 - the contract between backend and app is documented and stable
 
+Current status:
+
+- the endpoint exists and the app is loading from Vapor
+- the contract is documented, but it is not stable enough yet
+- recent work exposed how easy it is for field name drift to break rendering
+
 ## Phase 4: Actions And Navigation
 
 - handle button actions from the SDUI payload
@@ -56,6 +62,13 @@ Exit criteria:
 
 - the app is resilient to bad payloads
 - the contract is protected by tests on both client and backend
+
+Near-term focus:
+
+- add stronger backend contract tests against the agreed JSON shape
+- add a clearer environment setup guide for simulator versus device base URLs
+- improve diagnostics beyond basic structured logging
+- consider renderer-level tests for the current four component types
 
 ## Guardrails
 
