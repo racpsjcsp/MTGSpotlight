@@ -45,6 +45,11 @@
 			path = MTGSpotlightUITests;
 			sourceTree = "<group>";
 		};
+		462319C32F6D02B100A1B2C3 /* Docs */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Docs;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +80,7 @@
 		4607395F2F6CD79C002B0B22 = {
 			isa = PBXGroup;
 			children = (
+				462319C32F6D02B100A1B2C3 /* Docs */,
 				4607396A2F6CD79C002B0B22 /* MTGSpotlight */,
 				460739782F6CD79E002B0B22 /* MTGSpotlightTests */,
 				460739822F6CD79E002B0B22 /* MTGSpotlightUITests */,

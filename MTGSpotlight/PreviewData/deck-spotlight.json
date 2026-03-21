@@ -1,0 +1,87 @@
+{
+  "screenId": "deck-spotlight",
+  "version": 1,
+  "title": "Deck Spotlight",
+  "components": [
+    {
+      "id": "hero-card",
+      "type": "hero",
+      "props": {
+        "eyebrowTitle": "Magic: The Gathering",
+        "deckName": "Izzet Phoenix",
+        "tagline": "Spell velocity, graveyard recursion, and fast pressure.",
+        "stats": [
+          {
+            "id": "colors",
+            "title": "Colors",
+            "value": "Blue / Red"
+          },
+          {
+            "id": "format",
+            "title": "Format",
+            "value": "Pioneer"
+          },
+          {
+            "id": "style",
+            "title": "Style",
+            "value": "Tempo"
+          }
+        ]
+      }
+    },
+    {
+      "id": "deck-summary",
+      "type": "text",
+      "props": {
+        "title": "Why this deck matters",
+        "body": "Izzet Phoenix rewards careful sequencing. Cheap spells fill the graveyard, smooth draws, and bring Arclight Phoenix back into play while the deck maintains pressure with efficient interaction."
+      }
+    },
+    {
+      "id": "featured-cards",
+      "type": "cardCarousel",
+      "props": {
+        "title": "Featured cards",
+        "cards": [
+          {
+            "id": "arclight-phoenix",
+            "name": "Arclight Phoenix",
+            "typeLine": "Creature",
+            "manaCost": "3R",
+            "note": "The main threat that turns spell chains into pressure.",
+            "theme": "phoenix"
+          },
+          {
+            "id": "treasure-cruise",
+            "name": "Treasure Cruise",
+            "typeLine": "Sorcery",
+            "manaCost": "7U",
+            "note": "Refuels after the graveyard has been stocked early.",
+            "theme": "cruise"
+          },
+          {
+            "id": "lightning-axe",
+            "name": "Lightning Axe",
+            "typeLine": "Instant",
+            "manaCost": "R",
+            "note": "Efficient removal that also supports graveyard setup.",
+            "theme": "axe"
+          }
+        ]
+      }
+    },
+    {
+      "id": "view-deck-button",
+      "type": "button",
+      "props": {
+        "title": "View Deck Details"
+      },
+      "action": {
+        "type": "openDeck",
+        "payload": {
+          "deckId": "izzet-phoenix"
+        }
+      }
+    }
+  ]
+}

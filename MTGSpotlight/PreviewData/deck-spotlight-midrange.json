@@ -1,0 +1,87 @@
+{
+  "screenId": "deck-spotlight-midrange",
+  "version": 1,
+  "title": "Midrange Spotlight",
+  "components": [
+    {
+      "id": "hero-card",
+      "type": "hero",
+      "props": {
+        "eyebrowTitle": "Magic: The Gathering",
+        "deckName": "Rakdos Midrange",
+        "tagline": "Disruption, removal, and resilient threats.",
+        "stats": [
+          {
+            "id": "colors",
+            "title": "Colors",
+            "value": "Black / Red"
+          },
+          {
+            "id": "format",
+            "title": "Format",
+            "value": "Pioneer"
+          },
+          {
+            "id": "style",
+            "title": "Style",
+            "value": "Midrange"
+          }
+        ]
+      }
+    },
+    {
+      "id": "deck-summary",
+      "type": "text",
+      "props": {
+        "title": "Why this variant is useful",
+        "body": "This payload proves the renderer is not hardcoded to one deck. The same SwiftUI renderer now shows a different title, different stats, different copy, and different cards without changing view layout code."
+      }
+    },
+    {
+      "id": "view-deck-button",
+      "type": "button",
+      "props": {
+        "title": "Inspect Midrange Plan"
+      },
+      "action": {
+        "type": "openDeck",
+        "payload": {
+          "deckId": "rakdos-midrange"
+        }
+      }
+    },
+    {
+      "id": "featured-cards",
+      "type": "cardCarousel",
+      "props": {
+        "title": "Pressure and disruption",
+        "cards": [
+          {
+            "id": "fatal-push",
+            "name": "Fatal Push",
+            "typeLine": "Instant",
+            "manaCost": "B",
+            "note": "Cheap interaction that keeps early pressure in check.",
+            "theme": "axe"
+          },
+          {
+            "id": "fable-of-the-mirror-breaker",
+            "name": "Fable of the Mirror-Breaker",
+            "typeLine": "Enchantment",
+            "manaCost": "2R",
+            "note": "Generates value over multiple turns and smooths draws.",
+            "theme": "phoenix"
+          },
+          {
+            "id": "graveyard-trespasser",
+            "name": "Graveyard Trespasser",
+            "typeLine": "Creature",
+            "manaCost": "2B",
+            "note": "Attacks graveyards while applying steady pressure.",
+            "theme": "cruise"
+          }
+        ]
+      }
+    }
+  ]
+}

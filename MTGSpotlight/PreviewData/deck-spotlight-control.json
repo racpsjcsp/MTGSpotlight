@@ -1,0 +1,87 @@
+{
+  "screenId": "deck-spotlight-control",
+  "version": 1,
+  "title": "Control Spotlight",
+  "components": [
+    {
+      "id": "hero-card",
+      "type": "hero",
+      "props": {
+        "eyebrowTitle": "Magic: The Gathering",
+        "deckName": "Azorius Control",
+        "tagline": "Play long games, deny threats, and win on your terms.",
+        "stats": [
+          {
+            "id": "colors",
+            "title": "Colors",
+            "value": "Blue / White"
+          },
+          {
+            "id": "format",
+            "title": "Format",
+            "value": "Pioneer"
+          },
+          {
+            "id": "style",
+            "title": "Style",
+            "value": "Control"
+          }
+        ]
+      }
+    },
+    {
+      "id": "featured-cards",
+      "type": "cardCarousel",
+      "props": {
+        "title": "Key interaction pieces",
+        "cards": [
+          {
+            "id": "supreme-verdict",
+            "name": "Supreme Verdict",
+            "typeLine": "Sorcery",
+            "manaCost": "1WWU",
+            "note": "Resets the board when aggressive decks overcommit.",
+            "theme": "cruise"
+          },
+          {
+            "id": "the-wandering-emperor",
+            "name": "The Wandering Emperor",
+            "typeLine": "Planeswalker",
+            "manaCost": "2WW",
+            "note": "Flexible instant-speed threat and stabilizer.",
+            "theme": "phoenix"
+          },
+          {
+            "id": "memory-deluge",
+            "name": "Memory Deluge",
+            "typeLine": "Instant",
+            "manaCost": "2UU",
+            "note": "Card selection that rewards playing into the late game.",
+            "theme": "axe"
+          }
+        ]
+      }
+    },
+    {
+      "id": "deck-summary",
+      "type": "text",
+      "props": {
+        "title": "Game plan",
+        "body": "Azorius Control trades resources efficiently, stretches the game, and eventually wins through superior card quality. Notice that this JSON places the card carousel before the explanatory text, but the app still renders correctly."
+      }
+    },
+    {
+      "id": "view-deck-button",
+      "type": "button",
+      "props": {
+        "title": "Open Control List"
+      },
+      "action": {
+        "type": "openDeck",
+        "payload": {
+          "deckId": "azorius-control"
+        }
+      }
+    }
+  ]
+}
