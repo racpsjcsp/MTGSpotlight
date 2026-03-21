@@ -42,21 +42,21 @@ final class HomeViewModel: ObservableObject {
 
     enum State {
         case loading
-        case loaded(HomeScreen)
+        case loaded(SpotlightScreen)
         case error(String)
     }
 
     @Published private(set) var state: State = .loading
     @Published private(set) var selectedVariant: Variant = .phoenix
 
-    private let contentService: HomeContentServing
+    private let contentService: SpotlightContentServing
     private var hasLoaded = false
 
     init() {
-        self.contentService = LocalHomeContentService(bundle: .main)
+        self.contentService = LocalSpotlightContentService(bundle: .main)
     }
 
-    init(contentService: HomeContentServing) {
+    init(contentService: SpotlightContentServing) {
         self.contentService = contentService
     }
 
@@ -82,5 +82,16 @@ final class HomeViewModel: ObservableObject {
         guard selectedVariant != variant else { return }
         selectedVariant = variant
         retry()
+    }
+
+    func handle(_ action: SpotlightAction?) {
+        guard let action else { return }
+
+        switch action.type {
+        case "openDeck":
+            debugPrint("Open deck action received:", action.payload)
+        default:
+            debugPrint("Unsupported action received:", action.type)
+        }
     }
 }

@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct ScreenRenderer: View {
-    let components: [ScreenComponent]
-    let actionHandler: (ScreenAction?) -> Void
+    let components: [SpotlightComponent]
+    let actionHandler: (SpotlightAction?) -> Void
 
     var body: some View {
         ForEach(components) { component in
@@ -18,7 +18,7 @@ struct ScreenRenderer: View {
     }
 
     @ViewBuilder
-    private func render(_ component: ScreenComponent) -> some View {
+    private func render(_ component: SpotlightComponent) -> some View {
         switch component {
         case let .hero(_, props):
             HeroCardView(props: props)

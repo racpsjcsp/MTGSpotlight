@@ -78,9 +78,9 @@ Typed payloads and supporting UI models.
 
 ## Initial Flow
 
-1. `DeckSpotlightView` appears.
-2. `DeckSpotlightViewModel` requests a screen from the backend.
-3. `ScreenService` calls the Vapor endpoint.
+1. `HomeView` appears.
+2. `HomeViewModel` requests a spotlight screen from a content service.
+3. `LocalSpotlightContentService` loads a local JSON payload for the selected variant.
 4. JSON is decoded into typed models.
 5. `ScreenRenderer` loops through components and renders the matching SwiftUI view for each supported type.
 6. User actions are routed back to the ViewModel.
@@ -91,46 +91,39 @@ This is the recommended starting point for the iOS app:
 
 ```text
 MTGSpotlight/
-  App/
-    MTGSpotlightApp.swift
   Features/
-    DeckSpotlight/
+    Home/
       Views/
-        DeckSpotlightView.swift
+        HomeView.swift
       ViewModels/
-        DeckSpotlightViewModel.swift
-      Models/
-        DeckSpotlightScreen.swift
+        HomeViewModel.swift
   SDUI/
     Models/
-      ScreenDTO.swift
-      ComponentDTO.swift
-      ActionDTO.swift
+      ScreenModels.swift
     Rendering/
       ScreenRenderer.swift
-      ComponentRenderer.swift
     Components/
-      TextBlockView.swift
-      HeroImageView.swift
-      CardCarouselView.swift
-      CTAButtonView.swift
-  Services/
-    API/
-      APIClient.swift
-      ScreenService.swift
-  Shared/
-    UI/
-    Utilities/
+      HeroCardView.swift
+      TextSectionView.swift
+      CardCarouselSectionView.swift
+      ActionButtonSectionView.swift
+      CardPreviewView.swift
+      SpotlightStatView.swift
+    Services/
+      SpotlightContentService.swift
   PreviewData/
-    deck-spotlight-screen.json
+    deck-spotlight.json
+    deck-spotlight-control.json
+    deck-spotlight-midrange.json
 ```
 
 ## Why This Structure
 
 - `Features/` keeps product code grouped by use case
 - `SDUI/` isolates the server-driven part so it does not leak everywhere
-- `Services/` keeps networking away from views
+- `Features/Home/` keeps the current MVVM feature code grouped together
 - `PreviewData/` allows local rendering and easier iteration before backend integration is complete
+- `SDUI/Services/` keeps content loading away from views and ViewModels
 
 ## Navigation
 

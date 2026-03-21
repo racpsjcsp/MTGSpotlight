@@ -15,19 +15,19 @@ For Phase 1, support only a few component types. Do not design for every future 
   "title": "Deck Spotlight",
   "components": [
     {
-      "id": "hero-title",
-      "type": "text",
+      "id": "hero-card",
+      "type": "hero",
       "props": {
-        "text": "Izzet Phoenix",
-        "style": "title"
-      }
-    },
-    {
-      "id": "hero-description",
-      "type": "text",
-      "props": {
-        "text": "A spell-heavy deck focused on recursion and pressure.",
-        "style": "body"
+        "eyebrowTitle": "Magic: The Gathering",
+        "deckName": "Izzet Phoenix",
+        "tagline": "A spell-heavy deck focused on recursion and pressure.",
+        "stats": [
+          {
+            "id": "colors",
+            "title": "Colors",
+            "value": "Blue / Red"
+          }
+        ]
       }
     },
     {
@@ -39,8 +39,10 @@ For Phase 1, support only a few component types. Do not design for every future 
           {
             "id": "arc-light-phoenix",
             "name": "Arclight Phoenix",
-            "imageUrl": "https://cards.scryfall.io/large/front/...",
-            "subtitle": "Creature"
+            "typeLine": "Creature",
+            "manaCost": "3R",
+            "note": "Recurring threat.",
+            "theme": "phoenix"
           }
         ]
       }
@@ -71,30 +73,37 @@ For Phase 1, support only a few component types. Do not design for every future 
 
 ## Supported Component Types For Phase 1
 
-### `text`
+### `hero`
 
-Use for titles, subtitles, and descriptions.
+Use for the top summary block of the spotlight screen.
 
 Example props:
 
 ```json
 {
-  "text": "Deck Spotlight",
-  "style": "title"
+  "eyebrowTitle": "Magic: The Gathering",
+  "deckName": "Izzet Phoenix",
+  "tagline": "Spell-heavy pressure and recursion.",
+  "stats": [
+    {
+      "id": "colors",
+      "title": "Colors",
+      "value": "Blue / Red"
+    }
+  ]
 }
 ```
 
-### `image`
+### `text`
 
-Use for a single hero image if needed.
+Use for section titles and body copy.
 
 Example props:
 
 ```json
 {
-  "url": "https://...",
-  "aspectRatio": "16:9",
-  "contentMode": "fill"
+  "title": "Why this deck matters",
+  "body": "A spell-heavy strategy built around efficient recursion."
 }
 ```
 
@@ -111,8 +120,10 @@ Example props:
     {
       "id": "lightning-bolt",
       "name": "Lightning Bolt",
-      "imageUrl": "https://...",
-      "subtitle": "Instant"
+      "typeLine": "Instant",
+      "manaCost": "R",
+      "note": "Efficient interaction.",
+      "theme": "axe"
     }
   ]
 }
@@ -151,9 +162,9 @@ Recommended first action types:
 
 ## Client Rendering Rules
 
-- unknown component types should fail safely
+- unknown component types should be skipped safely
 - malformed props should not crash the app
-- unsupported components should render a fallback or be skipped with logging in debug builds
+- unsupported or malformed components should be skipped with logging in debug builds
 
 ## Schema Evolution Rules
 
@@ -175,11 +186,11 @@ Recommended approach:
 Conceptually:
 
 ```swift
-enum ScreenComponent: Decodable {
-    case text(TextProps)
-    case image(ImageProps)
+enum SpotlightComponent: Decodable {
+    case hero(HeroSectionProps)
+    case text(TextSectionProps)
     case cardCarousel(CardCarouselProps)
-    case button(ButtonProps, ActionDTO?)
+    case button(ButtonSectionProps, SpotlightAction?)
 }
 ```
 

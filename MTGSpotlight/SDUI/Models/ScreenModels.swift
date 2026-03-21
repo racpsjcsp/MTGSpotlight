@@ -6,13 +6,12 @@
 //
 
 import Foundation
-import SwiftUI
 
-struct HomeScreen: Decodable {
+struct SpotlightScreen: Decodable {
     let screenID: String
     let version: Int
     let title: String
-    let components: [ScreenComponent]
+    let components: [SpotlightComponent]
 
     enum CodingKeys: String, CodingKey {
         case screenID = "screenId"
@@ -20,13 +19,49 @@ struct HomeScreen: Decodable {
         case title
         case components
     }
+
+    init(
+        screenID: String,
+        version: Int,
+        title: String,
+        components: [SpotlightComponent]
+    ) {
+        self.screenID = screenID
+        self.version = version
+        self.title = title
+        self.components = components
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        screenID = try container.decode(String.self, forKey: .screenID)
+        version = try container.decode(Int.self, forKey: .version)
+        title = try container.decode(String.self, forKey: .title)
+
+        var componentsContainer = try container.nestedUnkeyedContainer(forKey: .components)
+        var decodedComponents: [SpotlightComponent] = []
+
+        while !componentsContainer.isAtEnd {
+            let componentDecoder = try componentsContainer.superDecoder()
+
+            do {
+                decodedComponents.append(try SpotlightComponent(from: componentDecoder))
+            } catch {
+#if DEBUG
+                debugPrint("Skipping unsupported or malformed component:", error)
+#endif
+            }
+        }
+
+        components = decodedComponents
+    }
 }
 
-enum ScreenComponent: Decodable, Identifiable {
+enum SpotlightComponent: Decodable, Identifiable {
     case hero(id: String, props: HeroSectionProps)
     case text(id: String, props: TextSectionProps)
     case cardCarousel(id: String, props: CardCarouselProps)
-    case button(id: String, props: ButtonSectionProps, action: ScreenAction?)
+    case button(id: String, props: ButtonSectionProps, action: SpotlightAction?)
 
     var id: String {
         switch self {
@@ -69,7 +104,7 @@ enum ScreenComponent: Decodable, Identifiable {
             self = .cardCarousel(id: id, props: props)
         case .button:
             let props = try container.decode(ButtonSectionProps.self, forKey: .props)
-            let action = try container.decodeIfPresent(ScreenAction.self, forKey: .action)
+            let action = try container.decodeIfPresent(SpotlightAction.self, forKey: .action)
             self = .button(id: id, props: props, action: action)
         }
     }
@@ -102,7 +137,7 @@ struct ButtonSectionProps: Decodable {
     let title: String
 }
 
-struct ScreenAction: Decodable {
+struct SpotlightAction: Decodable {
     let type: String
     let payload: [String: String]
 }
@@ -114,37 +149,10 @@ struct SpotlightCard: Decodable, Identifiable {
     let manaCost: String
     let note: String
     let theme: CardTheme
-
-    var gradient: LinearGradient {
-        theme.gradient
-    }
 }
 
 enum CardTheme: String, Decodable {
     case phoenix
     case cruise
     case axe
-
-    var gradient: LinearGradient {
-        switch self {
-        case .phoenix:
-            LinearGradient(
-                colors: [.orange, .red],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        case .cruise:
-            LinearGradient(
-                colors: [.blue, .cyan],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        case .axe:
-            LinearGradient(
-                colors: [.pink, .red.opacity(0.8)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        }
-    }
 }

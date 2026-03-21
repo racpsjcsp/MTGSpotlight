@@ -47,7 +47,7 @@ struct HomeView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     variantPicker
-                    ScreenRenderer(components: screen.components, actionHandler: handle)
+                    ScreenRenderer(components: screen.components, actionHandler: viewModel.handle)
                 }
                 .padding(20)
             }
@@ -96,17 +96,6 @@ struct HomeView: View {
         return Strings.deckSpotlightTitle
     }
 
-    private func handle(_ action: ScreenAction?) {
-        guard let action else { return }
-
-        switch action.type {
-        case "openDeck":
-            debugPrint("Open deck action received:", action.payload)
-        default:
-            debugPrint("Unsupported action received:", action.type)
-        }
-    }
-
     private var backgroundGradient: some View {
         LinearGradient(
             colors: [
@@ -121,5 +110,5 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView(viewModel: HomeViewModel(contentService: LocalHomeContentService(bundle: .main)))
+    HomeView(viewModel: HomeViewModel(contentService: LocalSpotlightContentService(bundle: .main)))
 }

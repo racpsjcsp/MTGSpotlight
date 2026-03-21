@@ -15,5 +15,5 @@ struct Strings {
     static let loadingFailedTitle = "Unable to Load Deck Spotlight"
     static let retryButtonTitle = "Retry"
     static let demoVariantTitle = "JSON Demo Variant"
-    static let homeContentMissingResourceErrorFormat = "The local JSON file '%@.json' could not be found."
+    static let spotlightContentMissingResourceErrorFormat = "The local JSON file '%@.json' could not be found."
 }

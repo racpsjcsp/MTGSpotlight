@@ -51,3 +51,19 @@ Consequence:
 
 - start with decoding and ViewModel tests
 - keep UI automation and snapshots limited until the component set settles
+
+## 2026-03-21
+
+### Decision: Skip Unsupported Or Malformed Components
+
+Reason:
+
+- one bad component should not blank the entire screen
+- this keeps SDUI demos and future backend integration more resilient
+- debug logging is enough for early diagnosis during development
+
+Consequence:
+
+- `SpotlightScreen` decodes the screen shell even when one component fails
+- unsupported or malformed components are dropped from the render list
+- decoding tests must verify skip behavior instead of whole-screen failure
