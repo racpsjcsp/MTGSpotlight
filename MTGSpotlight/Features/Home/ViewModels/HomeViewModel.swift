@@ -17,7 +17,13 @@ final class HomeViewModel: ObservableObject {
         case error(String)
     }
 
+    struct DeckDetailRoute: Identifiable, Equatable {
+        let id: String
+    }
+
     @Published private(set) var state: State = .loading
+    @Published private(set) var pendingExternalURL: URL?
+    @Published private(set) var presentedDeckDetailRoute: DeckDetailRoute?
 
     private let logger = Logger(subsystem: "com.rafaelplinio.MTGSpotlight", category: "HomeViewModel")
     private let contentService: SpotlightContentServing
@@ -53,11 +59,23 @@ final class HomeViewModel: ObservableObject {
     func handle(_ action: SpotlightAction?) {
         guard let action else { return }
 
-        switch action.type {
-        case "openDeck":
-            debugPrint("Open deck action received:", action.payload)
-        default:
-            debugPrint("Unsupported action received:", action.type)
+        switch action {
+        case let .openURL(url):
+            pendingExternalURL = url
+        case let .openDeck(deckID):
+            presentedDeckDetailRoute = DeckDetailRoute(id: deckID)
+        case .refresh:
+            logger.info("Refresh action received")
+        case let .unsupported(type, _):
+            logger.info("Unsupported action received: \(type, privacy: .public)")
         }
+    }
+
+    func consumePendingExternalURL() {
+        pendingExternalURL = nil
+    }
+
+    func dismissPresentedDeckDetailRoute() {
+        presentedDeckDetailRoute = nil
     }
 }

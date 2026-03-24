@@ -9,6 +9,7 @@ import SwiftUI
 
 @MainActor
 struct HomeView: View {
+    @Environment(\.openURL) private var openURL
     @StateObject private var viewModel: HomeViewModel
 
     init() {
@@ -28,6 +29,17 @@ struct HomeView: View {
         }
         .task {
             await viewModel.load()
+        }
+        .onChange(of: viewModel.pendingExternalURL) { _, url in
+            guard let url else { return }
+            openURL(url)
+            viewModel.consumePendingExternalURL()
+        }
+        .sheet(item: presentedDeckDetailRouteBinding) { route in
+            NavigationStack {
+                DeckDetailView(deckID: route.id)
+            }
+            .presentationDetents([.large])
         }
     }
 
@@ -68,6 +80,13 @@ struct HomeView: View {
         }
 
         return Strings.deckSpotlightTitle
+    }
+
+    private var presentedDeckDetailRouteBinding: Binding<HomeViewModel.DeckDetailRoute?> {
+        Binding(
+            get: { viewModel.presentedDeckDetailRoute },
+            set: { _ in viewModel.dismissPresentedDeckDetailRoute() }
+        )
     }
 
     private var backgroundGradient: some View {

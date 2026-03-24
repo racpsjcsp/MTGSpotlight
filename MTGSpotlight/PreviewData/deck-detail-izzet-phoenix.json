@@ -1,0 +1,65 @@
+{
+  "screenId": "deck-detail",
+  "version": 1,
+  "title": "Izzet Phoenix",
+  "components": [
+    {
+      "id": "deck-hero",
+      "type": "hero",
+      "props": {
+        "eyebrowTitle": "Deck Detail",
+        "deckName": "Izzet Phoenix",
+        "tagline": "Spell velocity, recursion, and fast pressure.",
+        "stats": [
+          { "id": "colors", "title": "Colors", "value": "Blue / Red" },
+          { "id": "format", "title": "Format", "value": "Pioneer" },
+          { "id": "style", "title": "Style", "value": "Tempo" }
+        ]
+      }
+    },
+    {
+      "id": "game-plan",
+      "type": "text",
+      "props": {
+        "title": "Game Plan",
+        "body": "Trade resources early, fill the graveyard, and turn recursion into pressure."
+      }
+    },
+    {
+      "id": "core-cards",
+      "type": "cardCarousel",
+      "props": {
+        "title": "Core Cards",
+        "cards": [
+          {
+            "id": "arclight-phoenix",
+            "name": "Arclight Phoenix",
+            "typeLine": "Creature",
+            "manaCost": "3R",
+            "note": "Primary recurring threat.",
+            "theme": "phoenix"
+          },
+          {
+            "id": "treasure-cruise",
+            "name": "Treasure Cruise",
+            "typeLine": "Sorcery",
+            "manaCost": "7U",
+            "note": "Refuels efficiently.",
+            "theme": "cruise"
+          }
+        ]
+      }
+    },
+    {
+      "id": "back-to-spotlight",
+      "type": "button",
+      "props": {
+        "title": "Back to Spotlight"
+      },
+      "action": {
+        "type": "refresh",
+        "payload": {}
+      }
+    }
+  ]
+}

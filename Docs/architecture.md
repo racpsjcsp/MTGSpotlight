@@ -35,6 +35,7 @@ That means the app is not a generic web browser for arbitrary JSON. The app will
 - render supported components
 - handle loading, error, and retry states
 - route user actions through ViewModels
+- support multiple explicit SDUI screen contracts when they provide real value
 
 ### Scryfall
 
@@ -87,6 +88,20 @@ Typed payloads and supporting UI models.
 
 The local JSON service still exists for previews and fixture-based tests, but it is no longer the default app path.
 
+## Deck Detail Flow
+
+`deck-detail` is now the second explicit SDUI screen contract in the app.
+
+Current flow:
+
+1. The spotlight screen renders a button with an `openDeck` action.
+2. `HomeViewModel` interprets that action and opens a deck-detail route for the selected `deckId`.
+3. `DeckDetailViewModel` requests `GET /screens/deck-detail/{deckId}` from Vapor.
+4. The detail response is decoded into the same typed screen model used by the spotlight screen.
+5. `DeckDetailView` renders the detail screen with `ScreenRenderer`.
+
+This keeps navigation native while still letting the backend own the detail screen content structure.
+
 ## Suggested Folder Structure
 
 This is the recommended starting point for the iOS app:
@@ -96,8 +111,10 @@ MTGSpotlight/
   Features/
     Home/
       Views/
+        DeckDetailView.swift
         HomeView.swift
       ViewModels/
+        DeckDetailViewModel.swift
         HomeViewModel.swift
   SDUI/
     Models/
@@ -114,6 +131,7 @@ MTGSpotlight/
     Services/
       SpotlightContentService.swift
   PreviewData/
+    deck-detail-izzet-phoenix.json
     deck-spotlight.json
     deck-spotlight-control.json
     deck-spotlight-midrange.json
@@ -135,7 +153,8 @@ These are the main issues visible after the first Vapor integration:
 - the app logs decoding failures in debug builds, but there is no stronger contract validation or diagnostics surfaced to the user
 - the base URL strategy is now safer, but still environment-driven and easy to misconfigure across simulator and device runs
 - `HomeViewModel` now uses structured logging, but diagnostics are still fairly minimal
-- action handling is still stubbed and does not yet prove a full end-to-end interaction path
+- the app now has two SDUI screen contracts, which increases the cost of contract drift if tests and docs fall behind
+- deck-detail currently opens as a sheet; whether that should remain a sheet or become push navigation is still a product decision
 
 These are acceptable for the current learning phase, but they should drive the next cleanup steps.
 
@@ -166,4 +185,6 @@ This keeps the learning curve shallow and makes each step easy to inspect.
 - Phase 1 foundation is complete
 - local SDUI rendering is complete
 - the app now loads the spotlight screen from Vapor
-- the next useful work is hardening the contract and improving diagnostics rather than adding more component types immediately
+- the app now also loads deck-detail screens from Vapor
+- `openDeck` no longer uses the temporary native bridge; it now opens a backend-driven detail screen
+- the next useful work is hardening the two screen contracts and improving diagnostics rather than adding more component types immediately

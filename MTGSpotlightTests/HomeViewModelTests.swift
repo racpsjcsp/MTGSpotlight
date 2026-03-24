@@ -61,7 +61,7 @@ struct HomeViewModelTests {
         let previousState = viewModel.state
 
         viewModel.handle(
-            SpotlightAction(type: "openDeck", payload: ["deckId": "izzet-phoenix"])
+            .openDeck(deckID: "izzet-phoenix")
         )
 
         guard case .loading = previousState else {
@@ -73,6 +73,48 @@ struct HomeViewModelTests {
             Issue.record("Handling an action should not mutate loading state yet")
             return
         }
+
+        #expect(viewModel.presentedDeckDetailRoute?.id == "izzet-phoenix")
+    }
+
+    @Test func handleActionPublishesPendingExternalURLForOpenURL() {
+        let viewModel = HomeViewModel(contentService: MockSpotlightContentService())
+
+        viewModel.handle(
+            .openURL(URL(string: "https://example.com/decks/izzet-phoenix")!)
+        )
+
+        #expect(viewModel.pendingExternalURL?.absoluteString == "https://example.com/decks/izzet-phoenix")
+    }
+
+    @Test func handleActionIgnoresUnsupportedAction() {
+        let viewModel = HomeViewModel(contentService: MockSpotlightContentService())
+
+        viewModel.handle(
+            .unsupported(type: "surpriseAction", payload: ["deckId": "izzet-phoenix"])
+        )
+
+        #expect(viewModel.pendingExternalURL == nil)
+    }
+
+    @Test func consumePendingExternalURLClearsPublishedURL() {
+        let viewModel = HomeViewModel(contentService: MockSpotlightContentService())
+
+        viewModel.handle(
+            .openURL(URL(string: "https://example.com")!)
+        )
+        viewModel.consumePendingExternalURL()
+
+        #expect(viewModel.pendingExternalURL == nil)
+    }
+
+    @Test func dismissPresentedDeckClearsPublishedDeckRoute() {
+        let viewModel = HomeViewModel(contentService: MockSpotlightContentService())
+
+        viewModel.handle(.openDeck(deckID: "izzet-phoenix"))
+        viewModel.dismissPresentedDeckDetailRoute()
+
+        #expect(viewModel.presentedDeckDetailRoute == nil)
     }
 }
 
@@ -84,6 +126,7 @@ private final class MockSpotlightContentService: SpotlightContentServing {
 
     private let result: Result
     private(set) var fetchCallCount = 0
+    private(set) var requestedDeckDetailIDs: [String] = []
 
     init(result: Result = .success) {
         self.result = result
@@ -95,6 +138,17 @@ private final class MockSpotlightContentService: SpotlightContentServing {
         switch result {
         case .success:
             return SpotlightScreen.fixture(title: "Phoenix Screen")
+        case let .failure(error):
+            throw error
+        }
+    }
+
+    func fetchDeckDetail(deckID: String) async throws -> SpotlightScreen {
+        requestedDeckDetailIDs.append(deckID)
+
+        switch result {
+        case .success:
+            return SpotlightScreen.fixture(title: "Izzet Phoenix Detail")
         case let .failure(error):
             throw error
         }
@@ -119,9 +173,36 @@ private extension SpotlightScreen {
             version: 1,
             title: title,
             components: [
+                .hero(
+                    id: "fixture-hero",
+                    props: HeroSectionProps(
+                        eyebrowTitle: "Magic: The Gathering",
+                        deckName: title,
+                        tagline: "Fixture tagline",
+                        stats: [
+                            HeroStat(id: "colors", title: "Colors", value: "Blue / Red")
+                        ]
+                    )
+                ),
                 .text(
                     id: "fixture-text",
                     props: TextSectionProps(title: "Fixture", body: "Body")
+                ),
+                .cardCarousel(
+                    id: "fixture-carousel",
+                    props: CardCarouselProps(
+                        title: "Featured Cards",
+                        cards: [
+                            SpotlightCard(
+                                id: "fixture-card",
+                                name: "Arclight Phoenix",
+                                typeLine: "Creature",
+                                manaCost: "3R",
+                                note: "Recurring threat.",
+                                theme: .phoenix
+                            )
+                        ]
+                    )
                 )
             ]
         )

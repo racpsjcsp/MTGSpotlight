@@ -55,6 +55,36 @@ struct SpotlightScreen: Decodable {
 
         components = decodedComponents
     }
+
+    var heroSectionProps: HeroSectionProps? {
+        for component in components {
+            if case let .hero(_, props) = component {
+                return props
+            }
+        }
+
+        return nil
+    }
+
+    var textSectionProps: [TextSectionProps] {
+        components.compactMap { component in
+            if case let .text(_, props) = component {
+                return props
+            }
+
+            return nil
+        }
+    }
+
+    var firstCardCarouselProps: CardCarouselProps? {
+        for component in components {
+            if case let .cardCarousel(_, props) = component {
+                return props
+            }
+        }
+
+        return nil
+    }
 }
 
 enum SpotlightComponent: Decodable, Identifiable {
@@ -137,9 +167,82 @@ struct ButtonSectionProps: Decodable {
     let title: String
 }
 
-struct SpotlightAction: Decodable {
-    let type: String
-    let payload: [String: String]
+enum SpotlightAction: Decodable, Equatable {
+    case openDeck(deckID: String)
+    case openURL(URL)
+    case refresh
+    case unsupported(type: String, payload: [String: String])
+
+    private enum CodingKeys: String, CodingKey {
+        case type
+        case payload
+    }
+
+    private enum ActionType: String, Decodable {
+        case openDeck
+        case openURL
+        case refresh
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let payload = try container.decodeIfPresent([String: String].self, forKey: .payload) ?? [:]
+
+        do {
+            switch try container.decode(ActionType.self, forKey: .type) {
+            case .openDeck:
+                guard let deckID = payload["deckId"], !deckID.isEmpty else {
+                    throw DecodingError.keyNotFound(
+                        PayloadCodingKeys.deckID,
+                        DecodingError.Context(
+                            codingPath: decoder.codingPath + [CodingKeys.payload],
+                            debugDescription: "Missing deckId for openDeck action."
+                        )
+                    )
+                }
+
+                self = .openDeck(deckID: deckID)
+
+            case .openURL:
+                guard let urlString = payload["url"], let url = URL(string: urlString) else {
+                    throw DecodingError.dataCorruptedError(
+                        forKey: .payload,
+                        in: container,
+                        debugDescription: "Missing or invalid url for openURL action."
+                    )
+                }
+
+                self = .openURL(url)
+
+            case .refresh:
+                self = .refresh
+            }
+        } catch DecodingError.typeMismatch {
+            let type = try container.decode(String.self, forKey: .type)
+            self = .unsupported(type: type, payload: payload)
+        } catch DecodingError.dataCorrupted {
+            let type = try container.decode(String.self, forKey: .type)
+            self = .unsupported(type: type, payload: payload)
+        }
+    }
+
+    private enum PayloadCodingKeys: String, CodingKey {
+        case deckID = "deckId"
+        case url
+    }
+
+    var typeDescription: String {
+        switch self {
+        case .openDeck:
+            return "openDeck"
+        case .openURL:
+            return "openURL"
+        case .refresh:
+            return "refresh"
+        case let .unsupported(type, _):
+            return type
+        }
+    }
 }
 
 struct SpotlightCard: Decodable, Identifiable {

@@ -51,6 +51,12 @@ Exit criteria:
 
 - action payloads trigger predictable app behavior
 
+Current status:
+
+- `openURL` is implemented end to end
+- `openDeck` now opens a backend-driven `deck-detail` screen
+- navigation works, but the product decision between sheet and push presentation is still open
+
 ## Phase 5: Hardening
 
 - add stronger contract tests
@@ -69,6 +75,7 @@ Near-term focus:
 - add a clearer environment setup guide for simulator versus device base URLs
 - improve diagnostics beyond basic structured logging
 - consider renderer-level tests for the current four component types
+- decide whether deck-detail should remain a sheet or move to push navigation
 
 ## Guardrails
 

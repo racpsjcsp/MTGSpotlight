@@ -9,6 +9,7 @@ import Foundation
 
 protocol SpotlightContentServing {
     func fetchDeckSpotlight() async throws -> SpotlightScreen
+    func fetchDeckDetail(deckID: String) async throws -> SpotlightScreen
 }
 
 struct LocalSpotlightContentService: SpotlightContentServing {
@@ -21,6 +22,14 @@ struct LocalSpotlightContentService: SpotlightContentServing {
     }
 
     func fetchDeckSpotlight() async throws -> SpotlightScreen {
+        try await loadScreen(resourceName: resourceName)
+    }
+
+    func fetchDeckDetail(deckID: String) async throws -> SpotlightScreen {
+        try await loadScreen(resourceName: "deck-detail-\(deckID)")
+    }
+
+    private func loadScreen(resourceName: String) async throws -> SpotlightScreen {
         guard let url = bundle.url(forResource: resourceName, withExtension: "json") else {
             throw SpotlightContentServiceError.missingResource(resourceName)
         }
@@ -43,8 +52,18 @@ struct RemoteSpotlightContentService: SpotlightContentServing {
     }
 
     func fetchDeckSpotlight() async throws -> SpotlightScreen {
+        try await fetchScreen(pathComponents: ["screens", "deck-spotlight"])
+    }
+
+    func fetchDeckDetail(deckID: String) async throws -> SpotlightScreen {
+        try await fetchScreen(pathComponents: ["screens", "deck-detail", deckID])
+    }
+
+    private func fetchScreen(pathComponents: [String]) async throws -> SpotlightScreen {
         let baseURL = try baseURL ?? AppEnvironment.apiBaseURL()
-        let endpoint = baseURL.appending(path: "screens").appending(path: "deck-spotlight")
+        let endpoint = pathComponents.reduce(baseURL) { partialURL, component in
+            partialURL.appending(path: component)
+        }
         let (data, response) = try await session.data(from: endpoint)
 
         guard let httpResponse = response as? HTTPURLResponse else {

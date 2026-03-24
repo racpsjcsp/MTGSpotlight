@@ -18,6 +18,50 @@
             endingLineNumber = "24"
             landmarkName = "fetchDeckSpotlight()"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "5324A824-83AD-4CF7-ADD1-0282F8A4E469 - 6c2060d2bae850dc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "MTGSpotlight.LocalSpotlightContentService.fetchDeckSpotlight() async throws -&gt; MTGSpotlight.SpotlightScreen"
+                  moduleName = "MTGSpotlight.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/rafaelplinio/Documents/MyApps/MTGSpotlightApp/MTGSpotlight/MTGSpotlight/SDUI/Services/SpotlightContentService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "24"
+                  endingLineNumber = "24">
+               </Location>
+               <Location
+                  uuid = "5324A824-83AD-4CF7-ADD1-0282F8A4E469 - 24a4f60d2e19db14"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for MTGSpotlight.LocalSpotlightContentService.fetchDeckSpotlight() async throws -&gt; MTGSpotlight.SpotlightScreen"
+                  moduleName = "MTGSpotlight.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/rafaelplinio/Documents/MyApps/MTGSpotlightApp/MTGSpotlight/MTGSpotlight/SDUI/Services/SpotlightContentService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "24"
+                  endingLineNumber = "24">
+               </Location>
+               <Location
+                  uuid = "5324A824-83AD-4CF7-ADD1-0282F8A4E469 - 2fc8cbea50409f16"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for MTGSpotlight.LocalSpotlightContentService.fetchDeckSpotlight() async throws -&gt; MTGSpotlight.SpotlightScreen"
+                  moduleName = "MTGSpotlight.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/rafaelplinio/Documents/MyApps/MTGSpotlightApp/MTGSpotlight/MTGSpotlight/SDUI/Services/SpotlightContentService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "24"
+                  endingLineNumber = "24">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

@@ -39,8 +39,38 @@ struct ScreenDecodingTests {
 
         #expect(id == "view-deck-button")
         #expect(props.title == "View Deck Details")
-        #expect(action?.type == "openDeck")
-        #expect(action?.payload["deckId"] == "izzet-phoenix")
+        #expect(action == .openDeck(deckID: "izzet-phoenix"))
+    }
+
+    @Test func decodesValidDeckDetailPayload() throws {
+        let screen = try JSONDecoder().decode(SpotlightScreen.self, from: Self.validDeckDetailJSON())
+
+        #expect(screen.screenID == "deck-detail")
+        #expect(screen.version == 1)
+        #expect(screen.title == "Izzet Phoenix")
+        #expect(screen.components.count == 4)
+
+        guard case let .hero(_, props) = screen.components[0] else {
+            Issue.record("Expected first deck detail component to be hero")
+            return
+        }
+
+        #expect(props.eyebrowTitle == "Deck Detail")
+        #expect(props.deckName == "Izzet Phoenix")
+        #expect(props.stats.count == 3)
+    }
+
+    @Test func decodesDeckDetailRefreshActionPayload() throws {
+        let screen = try JSONDecoder().decode(SpotlightScreen.self, from: Self.validDeckDetailJSON())
+
+        guard case let .button(id, props, action) = screen.components[3] else {
+            Issue.record("Expected fourth deck detail component to be button")
+            return
+        }
+
+        #expect(id == "back-to-spotlight")
+        #expect(props.title == "Back to Spotlight")
+        #expect(action == .refresh)
     }
 
     @Test func skipsUnknownComponentTypeAndKeepsScreenDecodable() throws {
@@ -69,7 +99,7 @@ struct ScreenDecodingTests {
         """
         {
           "screenId": "deck-spotlight",
-          "version": 1.0,
+          "version": 1,
           "title": "Deck Spotlight",
           "components": [
             {
@@ -135,7 +165,7 @@ struct ScreenDecodingTests {
         """
         {
           "screenId": "deck-spotlight",
-          "version": 1.0,
+          "version": 1,
           "title": "Deck Spotlight",
           "components": [
             {
@@ -156,7 +186,7 @@ struct ScreenDecodingTests {
         """
         {
           "screenId": "deck-spotlight",
-          "version": 1.0,
+          "version": 1,
           "title": "Deck Spotlight",
           "components": [
             {
@@ -176,7 +206,7 @@ struct ScreenDecodingTests {
         """
         {
           "screenId": "deck-spotlight",
-          "version": 1.0,
+          "version": 1,
           "title": "Deck Spotlight",
           "components": [
             {
@@ -184,6 +214,78 @@ struct ScreenDecodingTests {
               "type": "button",
               "props": {
                 "label": "Wrong key"
+              }
+            }
+          ]
+        }
+        """.utf8
+        )
+    }
+
+    private static func validDeckDetailJSON() -> Data {
+        Data(
+        """
+        {
+          "screenId": "deck-detail",
+          "version": 1,
+          "title": "Izzet Phoenix",
+          "components": [
+            {
+              "id": "deck-hero",
+              "type": "hero",
+              "props": {
+                "eyebrowTitle": "Deck Detail",
+                "deckName": "Izzet Phoenix",
+                "tagline": "Spell velocity, recursion, and fast pressure.",
+                "stats": [
+                  { "id": "colors", "title": "Colors", "value": "Blue / Red" },
+                  { "id": "format", "title": "Format", "value": "Pioneer" },
+                  { "id": "style", "title": "Style", "value": "Tempo" }
+                ]
+              }
+            },
+            {
+              "id": "game-plan",
+              "type": "text",
+              "props": {
+                "title": "Game Plan",
+                "body": "Trade resources early, fill the graveyard, and turn recursion into pressure."
+              }
+            },
+            {
+              "id": "core-cards",
+              "type": "cardCarousel",
+              "props": {
+                "title": "Core Cards",
+                "cards": [
+                  {
+                    "id": "arclight-phoenix",
+                    "name": "Arclight Phoenix",
+                    "typeLine": "Creature",
+                    "manaCost": "3R",
+                    "note": "Primary recurring threat.",
+                    "theme": "phoenix"
+                  },
+                  {
+                    "id": "treasure-cruise",
+                    "name": "Treasure Cruise",
+                    "typeLine": "Sorcery",
+                    "manaCost": "7U",
+                    "note": "Refuels efficiently.",
+                    "theme": "cruise"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "back-to-spotlight",
+              "type": "button",
+              "props": {
+                "title": "Back to Spotlight"
+              },
+              "action": {
+                "type": "refresh",
+                "payload": {}
               }
             }
           ]

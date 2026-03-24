@@ -4,7 +4,7 @@
 
 The schema should be small, explicit, and versioned by convention from the start.
 
-For Phase 1, support only a few component types. Do not design for every future possibility yet.
+For the current phase, support only a few component types across a small number of named screen contracts. Do not design for every future possibility yet.
 
 ## Recommended Payload Shape
 
@@ -64,12 +64,27 @@ For Phase 1, support only a few component types. Do not design for every future 
 }
 ```
 
+This base shape is shared by both:
+
+- `deck-spotlight`
+- `deck-detail`
+
+Current backend routes:
+
+- `GET /screens/deck-spotlight`
+- `GET /screens/deck-detail/{deckId}`
+
 ## Top-Level Fields
 
 - `screenId`: identifies the screen contract
 - `version`: allows schema evolution
 - `title`: optional navigation or analytics label
 - `components`: ordered list of renderable UI components
+
+Current supported `screenId` values:
+
+- `deck-spotlight`
+- `deck-detail`
 
 ## Supported Component Types For Phase 1
 
@@ -141,6 +156,8 @@ Example props:
 }
 ```
 
+The same supported component set is currently reused by both screen contracts.
+
 ## Action Shape
 
 Actions should also stay small in Phase 1.
@@ -167,6 +184,7 @@ Recommended first action types:
 - unsupported or malformed components should be skipped with logging in debug builds
 - supported components are expected to include their required keys exactly as documented
 - a component missing `id`, `type`, or valid `props` should be considered a backend contract bug
+- `screenId` determines which backend endpoint produced the screen, but rendering still depends on the shared component contract
 
 ## Schema Evolution Rules
 
@@ -206,5 +224,7 @@ The current client is intentionally strict about the contract:
 - `version` is an `Int`
 - every component requires `id` and `type`
 - `button` actions are decoded from the component level, not from `props`
+- `deck-spotlight` and `deck-detail` both decode into the same typed screen model
+- actions are interpreted through a typed client enum rather than raw string switching in the ViewModel
 
 This strictness is deliberate. It makes integration failures visible early while the schema is still small enough to control.

@@ -68,6 +68,35 @@ struct RemoteSpotlightContentServiceTests {
         }
     }
 
+    @Test func fetchDeckDetailRequestsDeckDetailEndpointAndDecodesPayload() async throws {
+        URLProtocolStub.responseProvider = {
+            let response = HTTPURLResponse(
+                url: URL(string: "http://127.0.0.1:8080/screens/deck-detail/izzet-phoenix")!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: ["Content-Type": "application/json"]
+            )!
+
+            return (Self.validDeckDetailJSON(), response)
+        }
+
+        defer { URLProtocolStub.responseProvider = nil }
+
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [URLProtocolStub.self]
+
+        let service = RemoteSpotlightContentService(
+            baseURL: URL(string: "http://127.0.0.1:8080")!,
+            session: URLSession(configuration: configuration)
+        )
+
+        let screen = try await service.fetchDeckDetail(deckID: "izzet-phoenix")
+
+        #expect(URLProtocolStub.lastRequestURL?.path == "/screens/deck-detail/izzet-phoenix")
+        #expect(screen.screenID == "deck-detail")
+        #expect(screen.title == "Izzet Phoenix")
+    }
+
     nonisolated private static func validScreenJSON() -> Data {
         Data(
         """
@@ -124,6 +153,43 @@ struct RemoteSpotlightContentServiceTests {
                 "payload": {
                   "deckId": "izzet-phoenix"
                 }
+              }
+            }
+          ]
+        }
+        """.utf8
+        )
+    }
+
+    nonisolated private static func validDeckDetailJSON() -> Data {
+        Data(
+        """
+        {
+          "screenId": "deck-detail",
+          "version": 1,
+          "title": "Izzet Phoenix",
+          "components": [
+            {
+              "id": "deck-hero",
+              "type": "hero",
+              "props": {
+                "eyebrowTitle": "Deck Detail",
+                "deckName": "Izzet Phoenix",
+                "tagline": "Spell velocity, recursion, and fast pressure.",
+                "stats": [
+                  { "id": "colors", "title": "Colors", "value": "Blue / Red" }
+                ]
+              }
+            },
+            {
+              "id": "back-to-spotlight",
+              "type": "button",
+              "props": {
+                "title": "Back to Spotlight"
+              },
+              "action": {
+                "type": "refresh",
+                "payload": {}
               }
             }
           ]

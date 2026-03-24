@@ -22,6 +22,21 @@ struct BundledSpotlightPayloadTests {
         #expect(!screen.title.isEmpty)
         #expect(!screen.components.isEmpty)
     }
+
+    @Test func bundledDeckDetailPayloadDecodes() async throws {
+        let bundle = Bundle(for: TestBundleMarker.self)
+        let service = LocalSpotlightContentService(
+            resourceName: "deck-detail-izzet-phoenix",
+            bundle: bundle
+        )
+
+        let screen = try await service.fetchDeckSpotlight()
+
+        #expect(screen.screenID == "deck-detail")
+        #expect(screen.version == 1)
+        #expect(screen.title == "Izzet Phoenix")
+        #expect(!screen.components.isEmpty)
+    }
 }
 
 private final class TestBundleMarker {}

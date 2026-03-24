@@ -18,6 +18,7 @@ Verify that:
 - missing required fields fail predictably
 - unknown component types are handled safely
 - malformed nested props do not crash the app
+- both `deck-spotlight` and `deck-detail` payloads stay aligned with the shared screen contract
 
 Why this matters:
 
@@ -91,16 +92,21 @@ Do not try to cover every server-driven permutation with UI automation.
 Client:
 
 - decode a valid deck spotlight payload
+- decode a valid deck detail payload
 - reject a payload missing `type`
 - ignore or safely fail an unknown component type
 - ViewModel publishes loading then loaded state
 - ViewModel publishes error state on service failure
 - remote content service hits `/screens/deck-spotlight`
+- remote content service hits `/screens/deck-detail/:deckId`
 - remote content service fails predictably on non-2xx responses
+- deck detail ViewModel publishes loading, loaded, and error states
+- deck detail `refresh` actions reload the current backend-driven screen
 
 Backend:
 
 - `GET /screens/deck-spotlight` returns HTTP 200
+- `GET /screens/deck-detail/:deckId` returns HTTP 200 for known decks
 - response includes `screenId`, `version`, and `components`
 - every component includes `id`, `type`, and `props`
 - `button` action is emitted at the component level, not inside `props`
@@ -123,3 +129,11 @@ The current project is already feeling the cost of weak contract enforcement:
 - but that same resilience can hide backend regressions unless tests catch them quickly
 
 That means backend contract tests and shared sample payload validation should now move up in priority.
+
+That is even more important now that the project has two SDUI screen contracts instead of one.
+
+Current status:
+
+- client-side decoding coverage now exists for both `deck-spotlight` and `deck-detail`
+- remote service tests now cover both spotlight and deck-detail endpoints
+- deck detail loading behavior is covered at the ViewModel level

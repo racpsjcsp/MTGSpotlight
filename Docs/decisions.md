@@ -109,3 +109,32 @@ Consequence:
 - simulator runs can still default to `http://127.0.0.1:8080`
 - device runs now require explicit API base URL configuration
 - logging moved from temporary `print` statements to structured logging in the ViewModel
+
+### Decision: Add `deck-detail` As A Second Explicit SDUI Contract
+
+Reason:
+
+- deck content in MTG changes often enough that backend-owned detail presentation is valuable
+- the project had already proven the basic SDUI loop on the spotlight screen
+- keeping deck detail native would duplicate content decisions that now belong on the backend
+
+Consequence:
+
+- the app now supports two named screen contracts: `deck-spotlight` and `deck-detail`
+- `openDeck` triggers a second backend fetch rather than building a detail screen locally
+- navigation stays native, but content structure for both screens is backend-driven
+- tests and docs must now treat `deck-detail` as a first-class contract
+
+### Decision: Decode Actions Into A Typed Enum On The Client
+
+Reason:
+
+- raw action strings made the contract easier to drift and harder to reason about
+- the app only supports a small allowlist of actions, so the model should reflect that explicitly
+- typed actions make tests and ViewModel handling more precise
+
+Consequence:
+
+- the client now decodes actions into explicit cases like `openDeck`, `openURL`, and `refresh`
+- unsupported action types are still tolerated, but they are surfaced as an unsupported enum case rather than staying as raw strings
+- action handling logic now relies more on the compiler and less on string comparisons
