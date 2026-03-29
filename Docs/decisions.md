@@ -138,3 +138,44 @@ Consequence:
 - the client now decodes actions into explicit cases like `openDeck`, `openURL`, and `refresh`
 - unsupported action types are still tolerated, but they are surfaced as an unsupported enum case rather than staying as raw strings
 - action handling logic now relies more on the compiler and less on string comparisons
+
+## 2026-03-29
+
+### Decision: Move The Client To Swift 6.2 And Observation
+
+Reason:
+
+- the project already targets iOS 26.2 and uses Main Actor default isolation
+- `ObservableObject` and `@StateObject` were leaving the app on a legacy state-management path
+- the review pass surfaced fragile manual bindings that go away with modern Observation
+
+Consequence:
+
+- `HomeViewModel` and `DeckDetailViewModel` now use `@Observable`
+- the views own their models with `@State` and bind through `@Bindable`
+- the project now builds with Swift 6.2 settings, which also makes actor-isolation issues surface earlier
+
+### Decision: Keep Test Fixtures Aligned With Actual Bundling Behavior
+
+Reason:
+
+- bundled payload tests were loading resources from the test bundle even though the JSON files are packaged in the host app bundle
+- the wrong bundle hid a mismatch between the tests and the app's real runtime resource layout
+
+Consequence:
+
+- bundled payload tests now load preview JSON from `Bundle.main`
+- deck-detail fixture coverage now exercises `fetchDeckDetail(deckID:)` directly rather than reusing the spotlight path
+
+### Decision: Isolate URLProtocol Stub State Per Test Case
+
+Reason:
+
+- Swift Testing can schedule tests in ways that exposed response leakage between remote service tests
+- a single global stub handler caused one test to consume another test's mocked payload
+
+Consequence:
+
+- remote service tests now register stub handlers per test case
+- request capture is keyed per test, so expectations no longer depend on global mutable state
+- the suite remains deterministic even as Swift 6 concurrency and test scheduling become stricter

@@ -10,18 +10,18 @@ import SwiftUI
 @MainActor
 struct DeckDetailView: View {
     @Environment(\.openURL) private var openURL
-    @StateObject private var viewModel: DeckDetailViewModel
+    @State private var viewModel: DeckDetailViewModel
 
     init(deckID: String) {
-        _viewModel = StateObject(wrappedValue: DeckDetailViewModel(deckID: deckID))
+        _viewModel = State(initialValue: DeckDetailViewModel(deckID: deckID))
     }
 
     init(deckID: String, contentService: SpotlightContentServing) {
-        _viewModel = StateObject(wrappedValue: DeckDetailViewModel(deckID: deckID, contentService: contentService))
+        _viewModel = State(initialValue: DeckDetailViewModel(deckID: deckID, contentService: contentService))
     }
 
     init(viewModel: DeckDetailViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+        _viewModel = State(initialValue: viewModel)
     }
 
     var body: some View {
@@ -95,15 +95,13 @@ struct DeckDetailView: View {
     }
 }
 
-struct DeckDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationStack {
-            DeckDetailView(
-                viewModel: DeckDetailViewModel(
-                    deckID: "izzet-phoenix",
-                    contentService: LocalSpotlightContentService(resourceName: "deck-detail-izzet-phoenix", bundle: .main)
-                )
+#Preview {
+    NavigationStack {
+        DeckDetailView(
+            viewModel: DeckDetailViewModel(
+                deckID: "izzet-phoenix",
+                contentService: LocalSpotlightContentService(resourceName: "deck-detail-izzet-phoenix", bundle: .main)
             )
-        }
+        )
     }
 }

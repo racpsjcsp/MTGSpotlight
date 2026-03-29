@@ -12,7 +12,7 @@ import Testing
 @MainActor
 struct BundledSpotlightPayloadTests {
     @Test func bundledPayloadDecodes() async throws {
-        let bundle = Bundle(for: TestBundleMarker.self)
+        let bundle = Bundle.main
         let service = LocalSpotlightContentService(bundle: bundle)
 
         let screen = try await service.fetchDeckSpotlight()
@@ -24,13 +24,9 @@ struct BundledSpotlightPayloadTests {
     }
 
     @Test func bundledDeckDetailPayloadDecodes() async throws {
-        let bundle = Bundle(for: TestBundleMarker.self)
-        let service = LocalSpotlightContentService(
-            resourceName: "deck-detail-izzet-phoenix",
-            bundle: bundle
-        )
+        let service = LocalSpotlightContentService(bundle: .main)
 
-        let screen = try await service.fetchDeckSpotlight()
+        let screen = try await service.fetchDeckDetail(deckID: "izzet-phoenix")
 
         #expect(screen.screenID == "deck-detail")
         #expect(screen.version == 1)
@@ -38,5 +34,3 @@ struct BundledSpotlightPayloadTests {
         #expect(!screen.components.isEmpty)
     }
 }
-
-private final class TestBundleMarker {}

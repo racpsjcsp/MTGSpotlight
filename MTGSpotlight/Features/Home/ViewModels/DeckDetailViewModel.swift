@@ -5,20 +5,21 @@
 //  Created by Codex on 23/03/26.
 //
 
-import Combine
 import Foundation
+import Observation
 import OSLog
 
 @MainActor
-final class DeckDetailViewModel: ObservableObject {
+@Observable
+final class DeckDetailViewModel {
     enum State {
         case loading
         case loaded(SpotlightScreen)
         case error(String)
     }
 
-    @Published private(set) var state: State = .loading
-    @Published private(set) var pendingExternalURL: URL?
+    private(set) var state: State = .loading
+    private(set) var pendingExternalURL: URL?
 
     let deckID: String
 

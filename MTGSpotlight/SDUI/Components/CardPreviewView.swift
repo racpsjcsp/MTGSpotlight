@@ -14,7 +14,7 @@ struct CardPreviewView: View {
         VStack(alignment: .leading, spacing: 8) {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(gradient)
-                .frame(width: 160, height: 220)
+                .frame(minWidth: 160, minHeight: 220)
                 .overlay(alignment: .topLeading) {
                     Text(card.manaCost)
                         .font(.caption.weight(.bold))
@@ -38,8 +38,9 @@ struct CardPreviewView: View {
             Text(card.note)
                 .font(.caption)
                 .foregroundStyle(.secondary)
-                .frame(width: 160, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(minWidth: 160, alignment: .leading)
     }
 
     private var gradient: LinearGradient {

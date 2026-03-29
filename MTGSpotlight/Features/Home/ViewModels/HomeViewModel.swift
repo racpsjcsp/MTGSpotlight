@@ -5,12 +5,13 @@
 //  Created by Rafael Plinio on 20/03/26.
 //
 
-import Combine
 import Foundation
+import Observation
 import OSLog
 
 @MainActor
-final class HomeViewModel: ObservableObject {
+@Observable
+final class HomeViewModel {
     enum State {
         case loading
         case loaded(SpotlightScreen)
@@ -21,9 +22,9 @@ final class HomeViewModel: ObservableObject {
         let id: String
     }
 
-    @Published private(set) var state: State = .loading
-    @Published private(set) var pendingExternalURL: URL?
-    @Published private(set) var presentedDeckDetailRoute: DeckDetailRoute?
+    private(set) var state: State = .loading
+    private(set) var pendingExternalURL: URL?
+    var presentedDeckDetailRoute: DeckDetailRoute?
 
     private let logger = Logger(subsystem: "com.rafaelplinio.MTGSpotlight", category: "HomeViewModel")
     private let contentService: SpotlightContentServing

@@ -36,6 +36,7 @@ Verify that:
 - failures publish usable error state
 - retry behavior works
 - actions are interpreted correctly
+- Observation-based state updates remain deterministic under Swift 6 actor isolation
 
 ### 3. Renderer Tests
 
@@ -102,6 +103,7 @@ Client:
 - remote content service fails predictably on non-2xx responses
 - deck detail ViewModel publishes loading, loaded, and error states
 - deck detail `refresh` actions reload the current backend-driven screen
+- URL loading stubs do not leak state across concurrently scheduled tests
 
 Backend:
 
@@ -137,3 +139,5 @@ Current status:
 - client-side decoding coverage now exists for both `deck-spotlight` and `deck-detail`
 - remote service tests now cover both spotlight and deck-detail endpoints
 - deck detail loading behavior is covered at the ViewModel level
+- bundled payload tests now load resources from the host app bundle, which matches how preview JSON is packaged today
+- remote service tests isolate URL protocol stub state per test case to avoid cross-test contamination

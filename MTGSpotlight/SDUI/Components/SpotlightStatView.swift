@@ -14,7 +14,7 @@ struct SpotlightStatView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title.uppercased())
-                .font(.caption2.weight(.bold))
+                .font(.caption.bold())
                 .foregroundStyle(.secondary)
 
             Text(value)

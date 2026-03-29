@@ -113,13 +113,13 @@ enum SpotlightContentServiceError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case let .missingResource(resourceName):
-            return String(format: Strings.spotlightContentMissingResourceErrorFormat, resourceName)
+            return "The local JSON file '\(resourceName).json' could not be found."
         case .missingAPIBaseURLConfiguration:
             return Strings.spotlightContentMissingAPIBaseURLError
         case .invalidResponse:
             return Strings.spotlightContentInvalidResponseError
         case let .requestFailed(statusCode):
-            return String(format: Strings.spotlightContentRequestFailedErrorFormat, statusCode)
+            return "The server request failed with status code \(statusCode)."
         }
     }
 }

@@ -6,13 +6,15 @@
 //
 
 import Foundation
+import Synchronization
 import Testing
 @testable import MTGSpotlight
 
+@Suite(.serialized)
 @MainActor
 struct RemoteSpotlightContentServiceTests {
     @Test func fetchDeckSpotlightRequestsVaporEndpointAndDecodesPayload() async throws {
-        URLProtocolStub.responseProvider = {
+        let testID = URLProtocolStub.registerResponseProvider {
             let response = HTTPURLResponse(
                 url: URL(string: "http://127.0.0.1:8080/screens/deck-spotlight")!,
                 statusCode: 200,
@@ -23,10 +25,9 @@ struct RemoteSpotlightContentServiceTests {
             return (Self.validScreenJSON(), response)
         }
 
-        defer { URLProtocolStub.responseProvider = nil }
-
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [URLProtocolStub.self]
+        configuration.httpAdditionalHeaders = [URLProtocolStub.testIDHeader: testID]
 
         let service = RemoteSpotlightContentService(
             baseURL: URL(string: "http://127.0.0.1:8080")!,
@@ -35,14 +36,16 @@ struct RemoteSpotlightContentServiceTests {
 
         let screen = try await service.fetchDeckSpotlight()
 
-        #expect(URLProtocolStub.lastRequestURL?.path == "/screens/deck-spotlight")
+        #expect(URLProtocolStub.lastRequestURL(for: testID)?.path == "/screens/deck-spotlight")
         #expect(screen.screenID == "deck-spotlight")
         #expect(screen.title == "Deck Spotlight")
         #expect(screen.components.count == 4)
+
+        URLProtocolStub.removeState(for: testID)
     }
 
     @Test func fetchDeckSpotlightThrowsForNonSuccessStatusCode() async {
-        URLProtocolStub.responseProvider = {
+        let testID = URLProtocolStub.registerResponseProvider {
             let response = HTTPURLResponse(
                 url: URL(string: "http://127.0.0.1:8080/screens/deck-spotlight")!,
                 statusCode: 500,
@@ -53,10 +56,9 @@ struct RemoteSpotlightContentServiceTests {
             return (Data(), response)
         }
 
-        defer { URLProtocolStub.responseProvider = nil }
-
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [URLProtocolStub.self]
+        configuration.httpAdditionalHeaders = [URLProtocolStub.testIDHeader: testID]
 
         let service = RemoteSpotlightContentService(
             baseURL: URL(string: "http://127.0.0.1:8080")!,
@@ -66,10 +68,12 @@ struct RemoteSpotlightContentServiceTests {
         await #expect(throws: SpotlightContentServiceError.self) {
             try await service.fetchDeckSpotlight()
         }
+
+        URLProtocolStub.removeState(for: testID)
     }
 
     @Test func fetchDeckDetailRequestsDeckDetailEndpointAndDecodesPayload() async throws {
-        URLProtocolStub.responseProvider = {
+        let testID = URLProtocolStub.registerResponseProvider {
             let response = HTTPURLResponse(
                 url: URL(string: "http://127.0.0.1:8080/screens/deck-detail/izzet-phoenix")!,
                 statusCode: 200,
@@ -80,10 +84,9 @@ struct RemoteSpotlightContentServiceTests {
             return (Self.validDeckDetailJSON(), response)
         }
 
-        defer { URLProtocolStub.responseProvider = nil }
-
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [URLProtocolStub.self]
+        configuration.httpAdditionalHeaders = [URLProtocolStub.testIDHeader: testID]
 
         let service = RemoteSpotlightContentService(
             baseURL: URL(string: "http://127.0.0.1:8080")!,
@@ -92,9 +95,11 @@ struct RemoteSpotlightContentServiceTests {
 
         let screen = try await service.fetchDeckDetail(deckID: "izzet-phoenix")
 
-        #expect(URLProtocolStub.lastRequestURL?.path == "/screens/deck-detail/izzet-phoenix")
+        #expect(URLProtocolStub.lastRequestURL(for: testID)?.path == "/screens/deck-detail/izzet-phoenix")
         #expect(screen.screenID == "deck-detail")
         #expect(screen.title == "Izzet Phoenix")
+
+        URLProtocolStub.removeState(for: testID)
     }
 
     nonisolated private static func validScreenJSON() -> Data {
@@ -200,8 +205,36 @@ struct RemoteSpotlightContentServiceTests {
 }
 
 private final class URLProtocolStub: URLProtocol, @unchecked Sendable {
-    static var responseProvider: (@Sendable () throws -> (Data, URLResponse))?
-    static var lastRequestURL: URL?
+    static let testIDHeader = "X-Test-ID"
+
+    private struct Entry {
+        var responseProvider: (@Sendable () throws -> (Data, URLResponse))
+        var lastRequestURL: URL?
+    }
+
+    private static let state = Mutex([String: Entry]())
+
+    static func registerResponseProvider(
+        _ responseProvider: @escaping @Sendable () throws -> (Data, URLResponse)
+    ) -> String {
+        let testID = UUID().uuidString
+
+        state.withLock {
+            $0[testID] = Entry(responseProvider: responseProvider, lastRequestURL: nil)
+        }
+
+        return testID
+    }
+
+    static func lastRequestURL(for testID: String) -> URL? {
+        state.withLock { $0[testID]?.lastRequestURL }
+    }
+
+    static func removeState(for testID: String) {
+        _ = state.withLock {
+            $0.removeValue(forKey: testID)
+        }
+    }
 
     override class func canInit(with request: URLRequest) -> Bool {
         true
@@ -212,14 +245,20 @@ private final class URLProtocolStub: URLProtocol, @unchecked Sendable {
     }
 
     override func startLoading() {
-        Self.lastRequestURL = request.url
+        guard
+            let testID = request.value(forHTTPHeaderField: Self.testIDHeader),
+            let entry = Self.state.withLock({ $0[testID] })
+        else {
+            client?.urlProtocol(self, didFailWithError: URLError(.badServerResponse))
+            return
+        }
 
         do {
-            guard let responseProvider = Self.responseProvider else {
-                throw URLError(.badServerResponse)
+            Self.state.withLock {
+                $0[testID]?.lastRequestURL = request.url
             }
 
-            let (data, response) = try responseProvider()
+            let (data, response) = try entry.responseProvider()
             client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
             client?.urlProtocol(self, didLoad: data)
             client?.urlProtocolDidFinishLoading(self)

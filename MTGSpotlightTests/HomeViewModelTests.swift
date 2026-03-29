@@ -167,6 +167,7 @@ private enum MockError: LocalizedError {
 }
 
 private extension SpotlightScreen {
+    @MainActor
     static func fixture(title: String) -> SpotlightScreen {
         SpotlightScreen(
             screenID: "fixture-screen",

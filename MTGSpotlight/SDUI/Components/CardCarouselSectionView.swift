@@ -15,7 +15,7 @@ struct CardCarouselSectionView: View {
             Text(props.title)
                 .font(.headline)
 
-            ScrollView(.horizontal, showsIndicators: false) {
+            ScrollView(.horizontal) {
                 HStack(spacing: 16) {
                     ForEach(props.cards) { card in
                         CardPreviewView(card: card)
@@ -23,6 +23,7 @@ struct CardCarouselSectionView: View {
                 }
                 .padding(.vertical, 4)
             }
+            .scrollIndicators(.hidden)
         }
     }
 }

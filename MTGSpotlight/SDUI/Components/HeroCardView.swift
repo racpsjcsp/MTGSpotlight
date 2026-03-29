@@ -41,6 +41,7 @@ struct HeroCardView: View {
                 .font(.title2)
                 .padding(18)
                 .foregroundStyle(.orange)
+                .accessibilityHidden(true)
         }
     }
 }

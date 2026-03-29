@@ -7,7 +7,7 @@ Use `SwiftUI + MVVM` on the client and treat SDUI as a contract between the Vapo
 This is the best fit for the current project because:
 
 - MVVM is already familiar
-- SwiftUI works naturally with observable view state
+- SwiftUI works naturally with Observation-based view state
 - SDUI already introduces enough complexity on its own
 - a heavier architecture would make learning slower without solving an immediate problem
 
@@ -62,6 +62,7 @@ Screen orchestration and action handling.
 - expose loading and error state
 - transform DTOs into render-ready state if needed
 - interpret component actions
+- use SwiftUI Observation (`@Observable`) instead of legacy Combine-based `ObservableObject` state
 
 ### Services
 
@@ -155,6 +156,7 @@ These are the main issues visible after the first Vapor integration:
 - `HomeViewModel` now uses structured logging, but diagnostics are still fairly minimal
 - the app now has two SDUI screen contracts, which increases the cost of contract drift if tests and docs fall behind
 - deck-detail currently opens as a sheet; whether that should remain a sheet or become push navigation is still a product decision
+- previews and fixture-backed tests still rely on bundled JSON, so resource placement must stay aligned with the host app bundle
 
 These are acceptable for the current learning phase, but they should drive the next cleanup steps.
 
@@ -187,4 +189,5 @@ This keeps the learning curve shallow and makes each step easy to inspect.
 - the app now loads the spotlight screen from Vapor
 - the app now also loads deck-detail screens from Vapor
 - `openDeck` no longer uses the temporary native bridge; it now opens a backend-driven detail screen
+- the client now uses Swift 6.2 project settings with Observation-based view models
 - the next useful work is hardening the two screen contracts and improving diagnostics rather than adding more component types immediately

@@ -10,17 +10,19 @@ import SwiftUI
 @MainActor
 struct HomeView: View {
     @Environment(\.openURL) private var openURL
-    @StateObject private var viewModel: HomeViewModel
+    @State private var viewModel: HomeViewModel
 
     init() {
-        _viewModel = StateObject(wrappedValue: HomeViewModel())
+        _viewModel = State(initialValue: HomeViewModel())
     }
 
     init(viewModel: HomeViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+        _viewModel = State(initialValue: viewModel)
     }
 
     var body: some View {
+        @Bindable var bindableViewModel = viewModel
+
         NavigationStack {
             content
                 .background(backgroundGradient)
@@ -35,7 +37,7 @@ struct HomeView: View {
             openURL(url)
             viewModel.consumePendingExternalURL()
         }
-        .sheet(item: presentedDeckDetailRouteBinding) { route in
+        .sheet(item: $bindableViewModel.presentedDeckDetailRoute) { route in
             NavigationStack {
                 DeckDetailView(deckID: route.id)
             }
@@ -82,13 +84,6 @@ struct HomeView: View {
         return Strings.deckSpotlightTitle
     }
 
-    private var presentedDeckDetailRouteBinding: Binding<HomeViewModel.DeckDetailRoute?> {
-        Binding(
-            get: { viewModel.presentedDeckDetailRoute },
-            set: { _ in viewModel.dismissPresentedDeckDetailRoute() }
-        )
-    }
-
     private var backgroundGradient: some View {
         LinearGradient(
             colors: [
@@ -102,12 +97,10 @@ struct HomeView: View {
     }
 }
 
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        HomeView(
-            viewModel: HomeViewModel(
-                contentService: LocalSpotlightContentService(bundle: .main)
-            )
+#Preview {
+    HomeView(
+        viewModel: HomeViewModel(
+            contentService: LocalSpotlightContentService(bundle: .main)
         )
-    }
+    )
 }
